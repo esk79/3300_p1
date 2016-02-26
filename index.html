@@ -1,0 +1,89 @@
+<html>
+<head>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <!-- Load the d3 library. -->
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <style>
+        /* put a border around the svg element so we can see the coordinate system better. */
+
+    </style>
+</head>
+<body>
+
+<!-- The SVG element will go in here -->
+<div id="graph"></div>
+
+<script>
+
+    function getRandomIntInclusive(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    var object = {
+        key: function (n) {
+            return this[Object.keys(this)[n]];
+        }
+    };
+    function key(obj, idx) {
+        return object.key.call(obj, idx);
+    }
+
+    var margin = {top: 30, right: 20, bottom: 35, left: 50},
+            width = 600 - margin.left - margin.right,
+            height = 270 - margin.top - margin.bottom;
+
+    var width = 1280,
+            height = 700;
+
+    var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+    var padding = 30;
+    var xScale = d3.scale.linear().domain([1990, 2013]).range([padding, width]);
+    var yScale = d3.scale.linear().domain([20, 70]).range([height - padding + 6, 0]);
+
+    var xAxis = d3.svg.axis().scale(xScale).orient("bottom").tickFormat(d3.format("d"))
+    var yAxis = d3.svg.axis().scale(yScale).orient("left")
+
+    svg.append("g").attr("transform", "translate(0," + (height - padding) + ")").attr("class", "axis")
+            .call(xAxis);
+    svg.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis")
+            .call(yAxis);
+
+    var years = [1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013]
+    var top_ten = [92, 164, 178, 16, 79, 97, 169, 62, 95]
+
+    //for console debugging
+    var data;
+    d3.csv("deforestation.csv", function (error, country) {
+        if (error) {
+            console.log(error);
+        }
+        data = country;
+
+        top_ten.forEach(function (country_id) {
+            years.forEach(function (year) {
+                var random = getRandomIntInclusive(22, 68)
+                var color = "#"+((1<<24)*Math.random()|0).toString(16)
+                var stringYear = "y" + year
+                console.log(stringYear)
+                svg.append("circle").attr("cx", xScale(year))
+                        .attr("cy", yScale(random))
+                        .attr("r", Math.sqrt(key(country[country_id], years.indexOf(year) + 36)) * 5)
+                        .attr("fill", color)
+            })
+        })
+
+    })
+    ;
+
+</script>
+
+</body>
+</html>
