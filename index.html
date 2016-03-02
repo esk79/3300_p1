@@ -12,13 +12,11 @@
             left: 7%;
             /*z-index: 1000;*/
         }
-
         #vertical-line {
             width: 0;
             border: 0px;
             height: 1400px
         }
-
         #year {
             position: fixed;
             text-align: center;
@@ -35,7 +33,6 @@
 <script>
     var old_year = 1990;
     var year;
-
 
     function getRandomIntInclusive(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -67,8 +64,8 @@
                     "translate(" + margin.left + "," + margin.top + ")");
 
     var padding = 30;
-    var xScale = d3.scale.linear().domain([1989, 2014]).range([padding, width]);
-    var yScale = d3.scale.linear().domain([20, 70]).range([height - padding + 6, 0]);
+    var xScale = d3.scale.linear().domain([1990, 2014]).range([padding, width]);
+    var yScale = d3.scale.linear().domain([30, 75]).range([height - padding + 6, 0]);
 
     var xAxis = d3.svg.axis().scale(xScale).orient("bottom").tickFormat(d3.format("d"))
     var yAxis = d3.svg.axis().scale(yScale).orient("left")
@@ -79,12 +76,10 @@
             .call(yAxis);
 
     var years = [1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013]
-    var top_ten = [92, 164, 178, 16, 79, 97, 169, 62, 95]
+    var top_ten = [92, 26, 16, 97, 27, 185, 87, 113]
 
     //for console debugging
     var data;
-
-
     $(document).on('scroll', function () {
         $(window).one('scroll', function () {
             year = years[Math.floor($(this).scrollTop() / 21.21)]
@@ -93,18 +88,15 @@
                 if (error) {
                     console.log(error);
                 }
-                data = country;
-                console.log(year)
-                console.log(old_year)
+                data = country
                 if (year != old_year) {
                     top_ten.forEach(function (country_id) {
-                        var random = getRandomIntInclusive(22, 68)
                         var color = "#" + ((1 << 24) * Math.random() | 0).toString(16)
+                        var area = key(country[country_id], years.indexOf(year) + 36)
                         svg.append("circle").attr("cx", xScale(year))
-                                .attr("cy", yScale(random))
-                                .attr("r", Math.sqrt(key(country[country_id], years.indexOf(year) + 36)) * 5)
+                                .attr("cy", yScale(area))
+                                .attr("r", 10)
                                 .attr("fill", color)
-
                     })
                     old_year = year
                 }
