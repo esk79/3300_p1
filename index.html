@@ -8,31 +8,35 @@
     <style>
         #graph {
             position: fixed;
-            top: 10%;
-            left: 7%;
-            /*z-index: 1000;*/
+            top: 20%;
+            left: 10%;
         }
+
         #vertical-line {
             width: 0;
             border: 0px;
             height: 1400px
         }
+
         #year {
             position: fixed;
-            text-align: center;
+            left: 46%;
             font-size: 40px;
         }
     </style>
 </head>
 <body>
-
-<p id="year"></p>
+<p id="year">Hello</p>
 <div id="graph"></div>
 <div id="vertical-line"></div>
 
 <script>
     var old_year = 1990;
     var year;
+
+    function percent_change(first, current) {
+        return ((current - first) / first) * 100
+    }
 
     function getRandomIntInclusive(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -52,8 +56,8 @@
             width = 600 - margin.left - margin.right,
             height = 270 - margin.top - margin.bottom;
 
-    var width = 1280,
-            height = 700;
+    var width = 1180,
+            height = 600;
 
     var svg = d3.select("#graph")
             .append("svg")
@@ -64,7 +68,7 @@
                     "translate(" + margin.left + "," + margin.top + ")");
 
     var padding = 30;
-    var xScale = d3.scale.linear().domain([1990, 2014]).range([padding, width]);
+    var xScale = d3.scale.linear().domain([0, 100]).range([padding, width]); //[451, 470000]
     var yScale = d3.scale.linear().domain([30, 75]).range([height - padding + 6, 0]);
 
     var xAxis = d3.svg.axis().scale(xScale).orient("bottom").tickFormat(d3.format("d"))
@@ -75,34 +79,60 @@
     svg.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis")
             .call(yAxis);
 
-    var years = [1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013]
-    var top_ten = [92, 26, 16, 97, 27, 185, 87, 113]
+    var years = [1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010]
+    //    var top_ten = [92, 26, 16, 97, 27, 185, 87, 113]
+
+    var top_ten = [
+        {id: 92, color: "#003300"},
+        {id: 26, color: "#006600"},
+        {id: 16, color: "#009900"},
+        {id: 97, color: "#00cc00"},
+        {id: 27, color: "#00ff00"},
+        {id: 185, color: "#33ff33"},
+        {id: 87, color: "#66ff66"},
+        {id: 113, color: "#99ff99"},
+    ]
+
 
     //for console debugging
     var data;
+    var dco2;
     $(document).on('scroll', function () {
         $(window).one('scroll', function () {
             year = years[Math.floor($(this).scrollTop() / 21.21)]
             $('#year').text(year);
-            d3.csv("deforestation.csv", function (error, country) {
+            d3.csv("CO2.csv", function (error, co2) {
                 if (error) {
                     console.log(error);
                 }
-                data = country
-                if (year != old_year) {
-                    top_ten.forEach(function (country_id) {
-                        var color = "#" + ((1 << 24) * Math.random() | 0).toString(16)
-                        var area = key(country[country_id], years.indexOf(year) + 36)
-                        svg.append("circle").attr("cx", xScale(year))
-                                .attr("cy", yScale(area))
-                                .attr("r", 10)
-                                .attr("fill", color)
-                    })
-                    old_year = year
-                }
+                dco2 = co2
+                d3.csv("deforestation.csv", function (error, country) {
+                    if (error) {
+                        console.log(error);
+                    }
+                    data = country
+                    if (year != old_year) {
+                        top_ten.forEach(function (current_country) {
+                            var country_index = top_ten.indexOf(current_country);
+                            var year_index = years.indexOf(year)
+                            console.log(year_index)
+                            var first = parseInt(key(co2[country_index], 0).replace(/,/g, ""))
+                            var current = parseInt(key(co2[country_index], year_index).replace(/,/g, ""))
+                            var p_change = percent_change(first, current)
+
+                            var color = current_country.color
+                            var area = key(country[current_country.id], year_index + 36)
+
+                            svg.append("circle").attr("cx", xScale(p_change))
+                                    .attr("cy", yScale(area))
+                                    .attr("r", 10)
+                                    .attr("fill", color)
+                        })
+                        old_year = year
+                    }
+                })
             })
         });
-
     });
 
 </script>
