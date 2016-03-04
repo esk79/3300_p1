@@ -23,6 +23,12 @@
             left: 46%;
             font-size: 40px;
         }
+        body { font-family: "Open Sans"; }
+        .axis path { fill: none; stroke: black; }
+        .axis line { stroke: black; }
+        .axis text { font-size: 10pt; }
+        path.outline { fill: none; stroke-width: 5; stroke: white; }
+        path.plot { fill: none; stroke-width: 3; }
     </style>
 </head>
 <body>
@@ -68,7 +74,7 @@
                     "translate(" + margin.left + "," + margin.top + ")");
 
     var padding = 30;
-    var xScale = d3.scale.linear().domain([0, 100]).range([padding, width]); //[451, 470000]
+    var xScale = d3.scale.linear().domain([0, 300]).range([padding, width]); //[451, 470000]
     var yScale = d3.scale.linear().domain([30, 75]).range([height - padding + 6, 0]);
 
     var xAxis = d3.svg.axis().scale(xScale).orient("bottom").tickFormat(d3.format("d"))
@@ -80,19 +86,20 @@
             .call(yAxis);
 
     var years = [1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010]
-    //    var top_ten = [92, 26, 16, 97, 27, 185, 87, 113]
-
     var top_ten = [
-        {id: 92, color: "#003300"},
-        {id: 26, color: "#006600"},
-        {id: 16, color: "#009900"},
-        {id: 97, color: "#00cc00"},
-        {id: 27, color: "#00ff00"},
-        {id: 185, color: "#33ff33"},
-        {id: 87, color: "#66ff66"},
-        {id: 113, color: "#99ff99"},
+        {id: 92, color: "#003300", line:[]},
+        {id: 26, color: "#006600", line:[]},
+        {id: 16, color: "#009900", line:[]},
+        {id: 97, color: "#00cc00", line:[]},
+        {id: 27, color: "#00ff00", line:[]},
+        {id: 185, color: "#33ff33", line:[]},
+        {id: 87, color: "#66ff66", line:[]},
+        {id: 113, color: "#99ff99", line:[]},
     ]
 
+    var line = d3.svg.line()
+            .x(function (d) { return d.x })
+            .y(function (d) { return d.y });
 
     //for console debugging
     var data;
@@ -105,7 +112,6 @@
                 if (error) {
                     console.log(error);
                 }
-<<<<<<< HEAD
                 dco2 = co2
                 d3.csv("deforestation.csv", function (error, country) {
                     if (error) {
@@ -119,10 +125,19 @@
                             console.log(year_index)
                             var first = parseInt(key(co2[country_index], 0).replace(/,/g, ""))
                             var current = parseInt(key(co2[country_index], year_index).replace(/,/g, ""))
-                            var p_change = percent_change(first, current)
+                            var p_change = Math.max(0,percent_change(first, current))
 
                             var color = current_country.color
                             var area = key(country[current_country.id], year_index + 36)
+                            current_country.line.push({x: xScale(p_change),y: yScale(area)})
+
+//                            svg.append("path").attr("d", line(current_country.line))
+//                                    .attr("class", "outline").attr("stroke", "white");
+
+                            console.log(current_country.color)
+
+                            svg.append("path").attr("d", line(current_country.line))
+                                    .attr("class", "plot").attr("stroke", current_country.color);
 
                             svg.append("circle").attr("cx", xScale(p_change))
                                     .attr("cy", yScale(area))
@@ -132,25 +147,6 @@
                         old_year = year
                     }
                 })
-=======
-                data = country
-                if (year != old_year) {
-                    top_ten.forEach(function (country_id) {
-                        var color = "#" + ((1 << 24) * Math.random() | 0).toString(16)
-                        var area = key(country[country_id], years.indexOf(year) + 36)
-                        svg.append("circle").attr("cx", xScale(year))
-                                .attr("cy", yScale(area))
-                                .attr("r", 10)
-                                .attr("fill", color)
-<<<<<<< HEAD
-
-                    });
-=======
-                    })
->>>>>>> b16055059664a624e7854480a1f77635f27838fc
-                    old_year = year
-                }
->>>>>>> refs/remotes/origin/Charlie
             })
         });
     });
