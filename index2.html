@@ -6,6 +6,11 @@
     <script src="http://d3js.org/topojson.v1.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <style>
+        @font-face{
+            font-family: MuseoSansCyrl;
+            src: url('MuseoSansCyrl.otf');
+        }
+
         #graph {
             position: fixed;
             top: 20%;
@@ -22,8 +27,28 @@
             position: fixed;
             left: 46%;
             font-size: 40px;
+            font-weight: bold;
         }
-        body { font-family: "Open Sans"; }
+
+        #xText{
+            position: fixed;
+            left: 40%;
+            top: 90%;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        #yText{
+            position: fixed;
+            transform: rotate(270deg);
+            transform-origin: left top 0;
+            left: 9%;
+            top: 74%;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        body{font-family: MuseoSansCyrl;}
         .axis path { fill: none; stroke: black; }
         .axis line { stroke: black; }
         .axis text { font-size: 10pt; }
@@ -32,7 +57,13 @@
     </style>
 </head>
 <body>
+<<<<<<< HEAD
 <p id="year"></p>
+=======
+<p id="year">Hello</p>
+<p id="xText">CO<sub>2</sub> Emssions (kilotons)</p>
+<p id="yText">Percent of land covered by forests</p>
+>>>>>>> 16a9734da29b03bdb1ef66522fd8d374189df430
 <div id="graph"></div>
 <div id="vertical-line"></div>
 
