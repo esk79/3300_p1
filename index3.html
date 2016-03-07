@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!--Load d3 libraries-->
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <!--Load jQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <style>
+    	/*Load font from directory*/
+        @font-face{
+            font-family: MuseoSansCyrl;
+            src: url('MuseoSansCyrl.otf');
+        }
+        #graphContainer{
+        	width: 615px;
+        	height: auto;
+        	margin: auto;
+        	border: 3px solid #ccc;
+        	padding: 5px;
+
+        }
+        .graph{
+        	position: relative;
+        	margin: 5px auto;
+        	width: 600px;
+        	height: 600px;
+        	overflow: hidden;
+        	border: 3px solid #ccc;
+        	font-family: MuseoSansCyrl;
+        }
+        .title{
+        	position: absolute;
+        	text-align: center;
+        	font-weight: bold;
+        	font-size: 20px;
+        	height: auto;
+        	width: auto;
+        	left: 50%;
+        	transform: translate(-50%, -50%);
+        }
+        .xLabel::before{
+        	content: "Countries";
+        }
+        .xLabel{
+       		position: absolute;
+        	margin: auto;
+        	text-align: center;
+        	width: auto;
+        	height: auto;
+        	font-size: 16px;
+        	bottom: 5px;
+        	left: 50%;
+        	transform: translate(-50%, -50%);
+        }
+        .yLabel::before{
+        	content: "% area covered by forests";
+        }
+        .yLabel{
+        	position: absolute;
+        	text-align: center;
+        	bottom: 50%;
+        	transform: rotate(270deg);
+        	left: -10%;
+        	margin: auto;
+        	width: auto;
+        	height: auto;
+        	font-size: 16px;
+        }
+        .bar{
+            fill: black;
+        }
+        .bar2{
+            fill: #0B3340;
+        }
+    </style>
+</head>
+<body>
+	<div id="graphContainer">
+		<div id="g1990" class="graph">
+			<p class="title">1990</p>
+			<p class="xLabel"></p>
+			<p class="yLabel"></p>
+		</div>
+		<div id="g1991" class="graph">
+			<p class="title">1991</p>
+			<p class="xLabel"></p>
+			<p class="yLabel"></p>
+		</div>
+	</div>
+<script>
+    var xScale = d3.scale.linear().domain([0, 400]).range([0, 400]);
+    var yScale = d3.scale.linear().domain([0, 400]).range([400, 0]);
+    var countries = ["USA", "Ecuador", "Bolivia", "Argentina", "Iran", "Russia", "France", "Canada"];
+
+    var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(8).tickFormat(function(d) {return countries[d];});
+    var yAxis = d3.svg.axis().scale(yScale).orient("left");
+	
+    var svg1 = d3.select("#g1990")
+        .append("svg")
+        .attr("width", 600)
+        .attr("height", 600)
+    svg1.append("g")
+        .attr("transform", "translate(100,500)")
+        .attr("class", "axis")
+        .call(xAxis);
+    svg1.append("g")
+        .attr("transform", "translate(100, 100)")
+        .attr("class", "axis")
+        .call(yAxis);
+    svg1.append("rect")
+        .attr("class", "bar")
+        .attr("width", 50)
+        .attr("height", 200)
+        .attr("x", 100)
+        .attr("y", 300);
+    svg1.append("rect")
+        .attr("class", "bar")
+        .attr("width", 50)
+        .attr("height", 30)
+        .attr("x", 150)
+        .attr("y", 470);
+    svg1.append("rect")
+        .attr("class", "bar")
+        .attr("width", 50)
+        .attr("height", 120)
+        .attr("x", 200)
+        .attr("y", 380);
+    svg1.append("rect")
+        .attr("class", "bar")
+        .attr("width", 50)
+        .attr("height", 80)
+        .attr("x", 250)
+        .attr("y", 420);
+    svg1.append("rect")
+        .attr("class", "bar")
+        .attr("width", 50)
+        .attr("height", 300)
+        .attr("x", 300)
+        .attr("y", 200)
+    svg1.append("rect")
+        .attr("class", "bar")
+        .attr("width", 50)
+        .attr("height", 150)
+        .attr("x", 350)
+        .attr("y", 350)
+    svg1.append("rect")
+        .attr("class", "bar")
+        .attr("width", 50)
+        .attr("height", 225)
+        .attr("x", 400)
+        .attr("y", 275)
+    svg1.append("rect")
+        .attr("class", "bar")
+        .attr("width", 50)
+        .attr("height", 50)
+        .attr("x", 450)
+        .attr("y", 450)
+
+    var svg2 = d3.select("#g1991")
+        .append("svg")
+        .attr("width", 600)
+        .attr("height", 600)
+    svg2.append("g")
+        .attr("transform", "translate(100,500)")
+        .attr("class", "axis")
+        .call(xAxis);
+    svg2.append("g")
+        .attr("transform", "translate(100, 100)")
+        .attr("class", "axis")
+        .call(yAxis);
+    svg2.append("rect")
+        .attr("class", "bar2")
+        .attr("width", 50)
+        .attr("height", 100)
+        .attr("x", 100)
+        .attr("y", 400);
+    svg2.append("rect")
+        .attr("class", "bar2")
+        .attr("width", 50)
+        .attr("height", 80)
+        .attr("x", 150)
+        .attr("y", 420);
+    svg2.append("rect")
+        .attr("class", "bar2")
+        .attr("width", 50)
+        .attr("height", 90)
+        .attr("x", 200)
+        .attr("y", 410);
+    svg2.append("rect")
+        .attr("class", "bar2")
+        .attr("width", 50)
+        .attr("height", 40)
+        .attr("x", 250)
+        .attr("y", 460);
+    svg2.append("rect")
+        .attr("class", "bar2")
+        .attr("width", 50)
+        .attr("height", 200)
+        .attr("x", 300)
+        .attr("y", 300)
+    svg2.append("rect")
+        .attr("class", "bar2")
+        .attr("width", 50)
+        .attr("height", 110)
+        .attr("x", 350)
+        .attr("y", 390)
+    svg2.append("rect")
+        .attr("class", "bar2")
+        .attr("width", 50)
+        .attr("height", 175)
+        .attr("x", 400)
+        .attr("y", 325)
+    svg2.append("rect")
+        .attr("class", "bar2")
+        .attr("width", 50)
+        .attr("height", 60)
+        .attr("x", 450)
+        .attr("y", 440)
+</script>
+</body>
+</html>
