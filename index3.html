@@ -1,0 +1,199 @@
+<html>
+<head>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <!-- Load the d3 library. -->
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <style>
+
+        @font-face {
+            font-family: MuseoSansCyrl;
+            src: url('MuseoSansCyrl.otf');
+        }
+
+        #xText {
+            position: fixed;
+            left: 38%;
+            top: 90%;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        #graph {
+            position: fixed;
+            top: 20%;
+            left: 10%;
+        }
+
+        #vertical-line {
+            width: 0;
+            border: 0px;
+            height: 1400px
+        }
+
+        #year {
+            position: fixed;
+            left: 46%;
+            font-size: 40px;
+        }
+
+        body {
+            font-family: MuseoSansCyrl;
+            background-color: #e6ffcc;
+        }
+
+        .axis path {
+            fill: none;
+            stroke: black;
+        }
+
+        .axis line {
+            stroke: black;
+        }
+
+        .axis text {
+            font-size: 10pt;
+        }
+    </style>
+</head>
+<body>
+<p id="year">1990</p>
+<p id="xText">Percent of Country Covered by Forest</p>
+<div id="graph"></div>
+<div id="vertical-line"></div>
+
+
+<script>
+    var old_year = 1990;
+    var year;
+
+    function percent_change(first, current) {
+        return ((current - first) / first) * 100
+    }
+
+    var object = {
+        key: function (n) {
+            return this[Object.keys(this)[n]];
+        }
+    }
+
+    function key(obj, idx) {
+        return object.key.call(obj, idx);
+    }
+
+    var margin = {top: 30, right: 20, bottom: 35, left: 50},
+            width = 600 - margin.left - margin.right,
+            height = 270 - margin.top - margin.bottom;
+
+    var width = 1180,
+            height = 600;
+
+    var barWidth = 50
+
+    var svg = d3.select("#graph")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+    var padding = 30;
+    var xScale = d3.scale.linear().domain([32, 75]).range([padding, width]);
+    var yScale = d3.scale.linear().domain([0, 9]).range([height - padding + 6, 0]);
+    var cScale = d3.scale.linear().domain([0, 200]).range(["#39e600", "#b34700"]);
+
+    var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(5)
+    var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(0)
+
+    svg.append("g").attr("transform", "translate(0," + (height - padding) + ")").attr("class", "axis")
+            .call(xAxis);
+    svg.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis")
+            .call(yAxis);
+
+    var years = [1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010]
+    var top_ten = [
+        {name: "Honduras", id: 92, color: "#003300"},
+        {name: "Bolivia", id: 26, color: "#006600"},
+        {name: "Benin", id: 16, color: "#009900"},
+        {name: "Indonesia", id: 97, color: "#00cc00"},
+        {name: "Brazil", id: 27, color: "#00ff00"},
+        {name: "Paraguay", id: 185, color: "#33ff33"},
+        {name: "Guatemala", id: 87, color: "#66ff66"},
+        {name: "Cambodia", id: 113, color: "#99ff99"},
+    ]
+
+    var line = d3.svg.line()
+            .x(function (d) {
+                return d.x
+            })
+            .y(function (d) {
+                return d.y
+            });
+
+    //for console debugging
+    var data;
+    var dco2;
+    d3.csv("CO2.csv", function (error, co2) {
+        if (error) {
+            console.log(error);
+        }
+        dco2 = co2
+        d3.csv("deforestation.csv", function (error, country) {
+            if (error) {
+                console.log(error);
+            }
+            data = country
+            top_ten.forEach(function (current_country) {
+                var country_index = top_ten.indexOf(current_country)
+                var area = key(country[current_country.id], 0 + 36)
+
+                svg.append('rect').attr('id', current_country.name)
+                        .style('fill', "#39e600")
+                        .attr('x', 0 + 33)
+                        .attr('width', xScale(area))
+                        .attr('y', yScale(country_index + 1.4))
+                        .attr('height', barWidth)
+
+                svg.append('text').attr('id', current_country.name)
+                        .text(current_country.name)
+                        .attr('x', xScale(area) - (current_country.name.length * 6))
+                        .attr('y', yScale(country_index + .9))
+                        .attr('fill', 'black')
+
+
+            })
+            $(document).on('scroll', function () {
+                $(window).one('scroll', function () {
+                    console.log($(this).scrollTop())
+                    year = years[Math.floor($(this).scrollTop() / 23.6)]
+
+                    $('#year').text(year);
+                    if (year != old_year) {
+                        top_ten.forEach(function (current_country) {
+                                    var year_index = years.indexOf(year)
+                                    var country_index = top_ten.indexOf(current_country);
+                                    var area = key(country[current_country.id], year_index + 36)
+                                    var first = parseInt(key(co2[country_index], 0).replace(/,/g, ""))
+                                    var current = parseInt(key(co2[country_index], year_index).replace(/,/g, ""))
+                                    var p_change = Math.max(0, percent_change(first, current))
+
+                                    current_rec = d3.select("rect#" + current_country.name)
+                                    current_rec.attr('width', xScale(area)).style('fill', cScale(Math.min(300, p_change)))
+
+                                    current_text = d3.select("text#" + current_country.name)
+                                    current_text.attr('x', xScale(area) - (current_country.name.length * 6))
+                                }
+                        )
+                        old_year = year
+                    }
+                })
+            })
+        });
+    });
+
+</script>
+
+</body>
+</html>

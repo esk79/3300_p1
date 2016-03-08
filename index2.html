@@ -6,6 +6,11 @@
     <script src="http://d3js.org/topojson.v1.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <style>
+        @font-face{
+            font-family: MuseoSansCyrl;
+            src: url('MuseoSansCyrl.otf');
+        }
+
         #graph {
             position: fixed;
             top: 20%;
@@ -22,20 +27,50 @@
             position: fixed;
             left: 46%;
             font-size: 40px;
+            font-weight: bold;
         }
+
+        #xText{
+            position: fixed;
+            left: 40%;
+            top: 90%;
+            font-size: 25px;
+            font-weight: bold;
+        }
+<<<<<<< HEAD
         body { font-family: "Open Sans"; 
         background-color: #d6d6c2;
     }
+=======
+
+        #yText{
+            position: fixed;
+            transform: rotate(270deg);
+            transform-origin: left top 0;
+            left: 9%;
+            top: 74%;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        body{font-family: MuseoSansCyrl;}
+>>>>>>> 3f3566b0b33b41cedcb880a91ed11d1ac00848a4
         .axis path { fill: none; stroke: black; }
         .axis line { stroke: black; }
         .axis text { font-size: 10pt; }
-        path.outline { fill: none; stroke-width: 5; stroke: white; }
+        /*path.outline { fill: none; stroke-width: 5; stroke: white; }*/
         path.plot { fill: none; stroke-width: 3; }
 
     </style>
 </head>
 <body>
+<<<<<<< HEAD
+<p id="year"></p>
+=======
 <p id="year">Hello</p>
+<p id="xText">CO<sub>2</sub> Emssions (kilotons)</p>
+<p id="yText">Percent of land covered by forests</p>
+>>>>>>> 16a9734da29b03bdb1ef66522fd8d374189df430
 <div id="graph"></div>
 <div id="vertical-line"></div>
 
@@ -77,7 +112,7 @@
                     "translate(" + margin.left + "," + margin.top + ")");
 
     var padding = 30;
-    var xScale = d3.scale.linear().domain([0, 300]).range([padding, width]); //[451, 470000]
+    var xScale = d3.scale.linear().domain([0, 700]).range([padding, width]); //[451, 470000]
     var yScale = d3.scale.linear().domain([30, 75]).range([height - padding + 6, 0]);
 
     var xAxis = d3.svg.axis().scale(xScale).orient("bottom").tickFormat(d3.format("d"))
@@ -90,14 +125,14 @@
 
     var years = [1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010]
     var top_ten = [
-        {id: 92, color: "#003300", line:[]},
-        {id: 26, color: "#006600", line:[]},
-        {id: 16, color: "#009900", line:[]},
-        {id: 97, color: "#00cc00", line:[]},
-        {id: 27, color: "#00ff00", line:[]},
-        {id: 185, color: "#33ff33", line:[]},
-        {id: 87, color: "#66ff66", line:[]},
-        {id: 113, color: "#99ff99", line:[]},
+        {name: test, id: 92, color: "#003300", line:[]},
+        {name: test, id: 26, color: "#006600", line:[]},
+        {name: test, id: 16, color: "#009900", line:[]},
+        {name: test, id: 97, color: "#00cc00", line:[]},
+        {name: test, id: 27, color: "#00ff00", line:[]},
+        {name: test, id: 185, color: "#33ff33", line:[]},
+        {name: test, id: 87, color: "#66ff66", line:[]},
+        {name: test, id: 113, color: "#99ff99", line:[]},
     ]
 
     var line = d3.svg.line()
@@ -144,7 +179,7 @@
 
                             svg.append("circle").attr("cx", xScale(p_change))
                                     .attr("cy", yScale(area))
-                                    .attr("r", 10)
+                                    .attr("r", 7)
                                     .attr("fill", color)
                         })
                         old_year = year

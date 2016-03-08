@@ -114,6 +114,7 @@
                 if (error) {
                     console.log(error);
                 }
+<<<<<<< HEAD
                 dco2 = co2
                 d3.csv("deforestation.csv", function (error, country) {
                     if (error) {
@@ -140,6 +141,25 @@
                         old_year = year
                     }
                 })
+=======
+                data = country
+                if (year != old_year) {
+                    top_ten.forEach(function (country_id) {
+                        var color = "#" + ((1 << 24) * Math.random() | 0).toString(16)
+                        var area = key(country[country_id], years.indexOf(year) + 36)
+                        svg.append("circle").attr("cx", xScale(year))
+                                .attr("cy", yScale(area))
+                                .attr("r", 10)
+                                .attr("fill", color)
+<<<<<<< HEAD
+
+                    });
+=======
+                    })
+>>>>>>> b16055059664a624e7854480a1f77635f27838fc
+                    old_year = year
+                }
+>>>>>>> refs/remotes/origin/Charlie
             })
         });
     });
