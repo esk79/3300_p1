@@ -6,12 +6,24 @@
     <script src="http://d3js.org/topojson.v1.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <style>
+
+        @font-face {
+            font-family: MuseoSansCyrl;
+            src: url('MuseoSansCyrl.otf');
+        }
+
+        #xText {
+            position: fixed;
+            left: 32%;
+            top: 90%;
+            font-size: 25px;
+            font-weight: bold;
+        }
         #graph {
             position: fixed;
             top: 20%;
-            left: 10%;
+            left: 7%;
         }
-
         #vertical-line {
             width: 0;
             border: 0px;
@@ -20,15 +32,85 @@
 
         #year {
             position: fixed;
-            left: 46%;
-            font-size: 40px;
+            top: 11%;
+            left: 42%;
+            font-size: 42px;
+            font-weight: bold;
+            border: 3px solid black;
+            padding: 3px;
+        }
+
+        #title{
+            position: fixed;
+            top: 3%;
+            left: 19%;
+            font-size: 30px;
+            font-style: italic;
+            font-weight: bold;
+        }
+
+        #infoFrom{
+            position: fixed;
+            bottom: 6%;
+            left: 4%;
+            font-size: 15px;
+            font-style: italic;
+        }
+
+        body {
+            font-family: MuseoSansCyrl;
+            background-color: #e6ffcc;
+        }
+
+        .axis path {
+            fill: none;
+            stroke: black;
+        }
+
+        .axis line {
+            stroke: black;
+        }
+
+        .axis text {
+            font-size: 10pt;
+        }
+
+        #legend {
+            position: fixed;
+            fill: white;
+            stroke: black;
+            opacity: 0.8;
+            left: 85%;
+            top: 80px;
+        }
+
+        #description{
+            position: fixed;
+            left: 80%;
+            bottom: 150px;
+            width: 250px;
+            height: 380px;
+            border: 3px solid black;
+            padding: 0px 6px;
         }
     </style>
 </head>
 <body>
-<p id="year">Hello</p>
+<p id="title">Observing changes in land covered by forests and CO2 emissions from 1990 to 2010</p>
+<p id="infoFrom">Information retrieved from the World Bank</p>
+<p id="year">1990</p>
+<div id="legend"></div>
+<p id="xText">Percent of Country Covered by Forest</p>
+
 <div id="graph"></div>
 <div id="vertical-line"></div>
+<div id="description">
+    <h2>How to use this graph:</h2>
+    <p>Our group wanted to look into deforestation and how CO2 emissions are affected in countries over time. The results are pretty dramatic, with massive changes observed in both quantity of land covered and the amount of CO2 present in each country.</p>
+    <p>This graph is a series of 20 graphs overlaid on top of one another.</p>
+    <p>To use, simply use your scroll wheel or scroll using the vertical scroll bar in your web browser.</p>
+</div>
+
 
 <script>
     var old_year = 1990;
@@ -36,10 +118,6 @@
 
     function percent_change(first, current) {
         return ((current - first) / first) * 100
-    }
-
-    function getRandomIntInclusive(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     var object = {
@@ -52,12 +130,15 @@
         return object.key.call(obj, idx);
     }
 
+
     var margin = {top: 30, right: 20, bottom: 35, left: 50},
             width = 600 - margin.left - margin.right,
             height = 270 - margin.top - margin.bottom;
 
-    var width = 1180,
-            height = 600;
+    var width = 1062,
+            height = 540;
+
+    var barWidth = 50
 
     var svg = d3.select("#graph")
             .append("svg")
@@ -68,11 +149,12 @@
                     "translate(" + margin.left + "," + margin.top + ")");
 
     var padding = 30;
-    var xScale = d3.scale.linear().domain([0, 100]).range([padding, width]); //[451, 470000]
-    var yScale = d3.scale.linear().domain([30, 75]).range([height - padding + 6, 0]);
+    var xScale = d3.scale.linear().domain([32, 75]).range([padding, width]);
+    var yScale = d3.scale.linear().domain([0, 9]).range([height - padding + 6, 0]);
+    var cScale = d3.scale.linear().domain([0, 200]).range(["#39e600", "#b34700"]);
 
-    var xAxis = d3.svg.axis().scale(xScale).orient("bottom").tickFormat(d3.format("d"))
-    var yAxis = d3.svg.axis().scale(yScale).orient("left")
+    var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(5)
+    var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(0)
 
     svg.append("g").attr("transform", "translate(0," + (height - padding) + ")").attr("class", "axis")
             .call(xAxis);
@@ -80,77 +162,117 @@
             .call(yAxis);
 
     var years = [1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010]
-    //    var top_ten = [92, 26, 16, 97, 27, 185, 87, 113]
-
     var top_ten = [
-        {id: 92, color: "#003300"},
-        {id: 26, color: "#006600"},
-        {id: 16, color: "#009900"},
-        {id: 97, color: "#00cc00"},
-        {id: 27, color: "#00ff00"},
-        {id: 185, color: "#33ff33"},
-        {id: 87, color: "#66ff66"},
-        {id: 113, color: "#99ff99"},
+        {name: "Honduras", id: 92, color: "#003300"},
+        {name: "Bolivia", id: 26, color: "#006600"},
+        {name: "Benin", id: 16, color: "#009900"},
+        {name: "Indonesia", id: 97, color: "#00cc00"},
+        {name: "Brazil", id: 27, color: "#00ff00"},
+        {name: "Paraguay", id: 185, color: "#33ff33"},
+        {name: "Guatemala", id: 87, color: "#66ff66"},
+        {name: "Cambodia", id: 113, color: "#99ff99"},
     ]
+
+    var line = d3.svg.line()
+            .x(function (d) {
+                return d.x
+            })
+            .y(function (d) {
+                return d.y
+            });
+
+    //  code for legend
+    var w = 140, h = 400;
+    var keys = d3.select("#legend")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
+    var legend = keys.append("defs")
+            .append("svg:linearGradient")
+            .attr("id", "gradient")
+            .attr("x1", "100%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+    legend.append("stop").attr("offset", "0%")
+            .attr("stop-color", "#b34700")
+            .attr("stop-opacity", 1);
+    legend.append("stop").attr("offset", "1000%")
+            .attr("stop-color", "#39e600")
+            .attr("stop-opacity", 1);
+    keys.append("rect")
+            .attr("width", w - 100).attr("height", h - 100)
+            .style("fill", "url(#gradient)").attr("transform", "translate(0,10)");
+    var y = d3.scale.linear().range([300, 0]).domain([1, 100]);
+    var yAxis = d3.svg.axis().scale(y)
+            .orient("right");
+    keys.append("g").attr("class", "y  axis")
+            .attr("transform", "translate(42,10)")
+            .call(yAxis).append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 30).attr("dy", ".71em")
+            .style("text-anchor", "end").text("% of CO2 Increase");
 
 
     //for console debugging
     var data;
     var dco2;
-    $(document).on('scroll', function () {
-        $(window).one('scroll', function () {
-            year = years[Math.floor($(this).scrollTop() / 21.21)]
-            $('#year').text(year);
-            d3.csv("CO2.csv", function (error, co2) {
-                if (error) {
-                    console.log(error);
-                }
-<<<<<<< HEAD
-                dco2 = co2
-                d3.csv("deforestation.csv", function (error, country) {
-                    if (error) {
-                        console.log(error);
-                    }
-                    data = country
+    d3.csv("CO2.csv", function (error, co2) {
+        if (error) {
+            console.log(error);
+        }
+        dco2 = co2
+        d3.csv("deforestation.csv", function (error, country) {
+            if (error) {
+                console.log(error);
+            }
+            data = country
+            top_ten.forEach(function (current_country) {
+                var country_index = top_ten.indexOf(current_country)
+                var area = key(country[current_country.id], 0 + 36)
+
+                svg.append('rect').attr('id', current_country.name)
+                        .style('fill', "#39e600")
+                        .attr('x', 0 + 33)
+                        .attr('width', xScale(area))
+                        .attr('y', yScale(country_index + 1.4))
+                        .attr('height', barWidth)
+
+
+                svg.append('text').attr('id', current_country.name)
+                        .text(current_country.name)
+                        .attr('x', xScale(area) - (current_country.name.length * 6))
+                        .attr('y', yScale(country_index + .9))
+                        .attr('fill', 'black')
+
+
+            })
+            $(document).on('scroll', function () {
+                $(window).one('scroll', function () {
+                    console.log($(this).scrollTop())
+                    year = years[Math.floor($(this).scrollTop() / 23.6)]
+
+                    $('#year').text(year);
                     if (year != old_year) {
                         top_ten.forEach(function (current_country) {
-                            var country_index = top_ten.indexOf(current_country);
-                            var year_index = years.indexOf(year)
-                            console.log(year_index)
-                            var first = parseInt(key(co2[country_index], 0).replace(/,/g, ""))
-                            var current = parseInt(key(co2[country_index], year_index).replace(/,/g, ""))
-                            var p_change = percent_change(first, current)
+                                    var year_index = years.indexOf(year)
+                                    var country_index = top_ten.indexOf(current_country);
+                                    var area = key(country[current_country.id], year_index + 36)
+                                    var first = parseInt(key(co2[country_index], 0).replace(/,/g, ""))
+                                    var current = parseInt(key(co2[country_index], year_index).replace(/,/g, ""))
+                                    var p_change = Math.max(0, percent_change(first, current))
 
-                            var color = current_country.color
-                            var area = key(country[current_country.id], year_index + 36)
+                                    current_rec = d3.select("rect#" + current_country.name)
+                                    current_rec.attr('width', xScale(area)).style('fill', cScale(Math.min(300, p_change)))
 
-                            svg.append("circle").attr("cx", xScale(p_change))
-                                    .attr("cy", yScale(area))
-                                    .attr("r", 10)
-                                    .attr("fill", color)
-                        })
+                                    current_text = d3.select("text#" + current_country.name)
+                                    current_text.attr('x', xScale(area) - (current_country.name.length * 6))
+                                }
+                        )
                         old_year = year
                     }
                 })
-=======
-                data = country
-                if (year != old_year) {
-                    top_ten.forEach(function (country_id) {
-                        var color = "#" + ((1 << 24) * Math.random() | 0).toString(16)
-                        var area = key(country[country_id], years.indexOf(year) + 36)
-                        svg.append("circle").attr("cx", xScale(year))
-                                .attr("cy", yScale(area))
-                                .attr("r", 10)
-                                .attr("fill", color)
-<<<<<<< HEAD
-
-                    });
-=======
-                    })
->>>>>>> b16055059664a624e7854480a1f77635f27838fc
-                    old_year = year
-                }
->>>>>>> refs/remotes/origin/Charlie
             })
         });
     });
