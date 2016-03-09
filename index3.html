@@ -59,6 +59,8 @@
 </head>
 <body>
 <p id="year">1990</p>
+<div id="legend"></div>
+
 <p id="xText">Percent of Country Covered by Forest</p>
 <div id="graph"></div>
 <div id="vertical-line"></div>
@@ -111,6 +113,21 @@
             .call(xAxis);
     svg.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis")
             .call(yAxis);
+
+    var legend = d3.select('#legend')
+            .append('ul')
+            .attr('class', 'list-inline');
+
+    var keys = legend.selectAll('li.key')
+            .data(colors.range());
+
+    keys.enter().append('li')
+            .attr('class', 'key')
+            .style('border-top-color', String)
+            .text(function(d) {
+                var r = colors.invertExtent(d);
+                return formats.percent(r[0]);
+            });
 
     var years = [1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010]
     var top_ten = [
